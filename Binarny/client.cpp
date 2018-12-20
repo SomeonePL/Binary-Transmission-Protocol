@@ -143,7 +143,10 @@ void client::ponow() {
 		std::cout << "<--trwa proba ponownego polaczenia-->\n";
 		wyczysc();
 		zadaj_polaczenia();
-		sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+		if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+		{
+			std::cout << "Blad sendto nr" << errno << std::endl;
+		}
 		wyczysc();
 
 	}
@@ -151,8 +154,10 @@ void client::ponow() {
 		std::cout << "<--zadanie zakonczenia polaczenia-->\n";
 		wyczysc();
 		zadaj_zakonczenia();
-
-		sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+		if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+		{
+			std::cout << "Blad sendto nr" << errno << std::endl;
+		}
 		wyczysc();
 	}
 	else {
@@ -190,14 +195,19 @@ void client::zadaj_wyslania() {
 		zadaj_zakonczenia();
 
 		//std::cout << "Buffer size: " << buffer_size << std::endl;
-
-		sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+		if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+		{
+			std::cout << "Blad sendto nr" << errno << std::endl;
+		}
 		wyczysc();
 		return;
 	}
 	else if (text == "###") {
 		wymus_koniec();
-		sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+		if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+		{
+			std::cout << "Blad sendto nr" << errno << std::endl;
+		}
 
 	}
 	else {
@@ -222,7 +232,10 @@ void client::zadaj_wyslania() {
 
 			//std::cout << "Buffer size: " << buffer_size << std::endl;
 
-			sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+			if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+			{
+				std::cout << "Blad sendto nr" << errno << std::endl;
+			}
 
 		} // DZIELENIE NA PACZKI
 		else if (bit_to_int(dlugosc.to_string()) > 1019 * 8) {
@@ -236,7 +249,10 @@ void client::zadaj_wyslania() {
 				wyslane++;
 
 				spakuj();
-				sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+				if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+				{
+					std::cout << "Blad sendto nr" << errno << std::endl;
+				}
 			}
 			flagi = 2;
 			id = identyfikator;
@@ -244,7 +260,10 @@ void client::zadaj_wyslania() {
 			zapisz(text.substr((wyslane + 1) * (1019 * 8), temp));
 
 			spakuj();
-			sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+			if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+			{
+				std::cout << "Blad sendto nr" << errno << std::endl;
+			}
 
 		}
 
@@ -388,8 +407,11 @@ int client::UDP() {
 
 	std::cout << "<----proba nawiazania polaczenia---->\n";
 	zadaj_polaczenia();
-
-	sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+	
+	if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+	{
+		std::cout << "Blad sendto nr" << errno << std::endl;
+	}
 	
 	std::cout << "<-wyslano->\n";
 	wyczysc();
@@ -415,7 +437,10 @@ int client::UDP() {
 				std::cout << "<----trwa zapraszanie innego uytkownika do rozmowy---->\n";
 				wyczysc();
 				zadaj_zaproszenia();
-				sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+				if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+				{
+					std::cout << "Blad sendto nr" << errno << std::endl;
+				}
 				while (operacja == 1 && odpowiedz == 0) {
 				}
 			}
@@ -444,14 +469,20 @@ int client::UDP() {
 				std::cout << "<--przyjmowanie zaproszenia-->\n";
 				wyczysc();
 				przyjmij_zaproszenie();
-				sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+				if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+				{
+					std::cout << "Blad sendto nr" << errno << std::endl;
+				}
 				rozmowa();
 			}
 			if (reakcja == '2') {
 				std::cout << "<----odrzucanie zaproszenia---->\n";
 				wyczysc();
 				odrzuc_zaproszenie();
-				sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+				if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+				{
+					std::cout << "Blad sendto nr" << errno << std::endl;
+				}
 				wyczysc();
 			}
 		}
@@ -475,13 +506,19 @@ int client::UDP() {
 				std::cout << "<----trwa ponowne zapraszaine do rozmowy---->\n";
 				wyczysc();
 				zadaj_zaproszenia();
-				sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+				if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+				{
+					std::cout << "Blad sendto nr" << errno << std::endl;
+				}
 			}
 			if (reakcja == '2') {
 				std::cout << "<----zakonczenie polaczenia---->\n";
 				wyczysc();
 				potwierdz_zakonczenie();
-				sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+				if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+				{
+					std::cout << "Blad sendto nr" << errno << std::endl;
+				}
 			}
 		}
 
@@ -494,13 +531,19 @@ int client::UDP() {
 				std::cout << "<----trwa proba ponownego zaproszenia uzytkownika---->\n";
 				wyczysc();
 				zadaj_zaproszenia();
-				sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+				if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+				{
+					std::cout << "Blad sendto nr" << errno << std::endl;
+				}
 			}
 			if (reakcja == '2') {
 				std::cout << "<----zadanie zakonczenia polaczenia---->\n";
 				wyczysc();
 				zadaj_zakonczenia();
-				sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+				if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+				{
+					std::cout << "Blad sendto nr" << errno << std::endl;
+				}
 				wyczysc();
 			}
 		}
@@ -516,7 +559,10 @@ int client::UDP() {
 			if (reakcja == '1') {
 				std::cout << "<----zezwolono na rozlaczenie---->\n";
 				potwierdz_zakonczenie();
-				sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+				if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+				{
+					std::cout << "Blad sendto nr" << errno << std::endl;
+				}
 				break;
 			}
 			if (reakcja == '2') {
@@ -567,7 +613,10 @@ void client::odbierz_wiadomosc(SOCKET client_socket, char buffer[1024], SOCKADDR
 			std::cout << "\nRozmowca napisal: " << std::endl;
 
 			potwierdzenie();
-			sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+			if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+			{
+				std::cout << "Blad sendto nr" << errno << std::endl;
+			}
 			wyczysc();
 
 			for (int j = 0; j < (z2na10(dlugosc.to_string()) - 10); j = j + 8) {
@@ -585,7 +634,10 @@ void client::odbierz_wiadomosc(SOCKET client_socket, char buffer[1024], SOCKADDR
 					std::cout << "\nRozmowca napisal: " << std::endl;
 
 					potwierdzenie();
-					sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size);
+					if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
+					{
+						std::cout << "Blad sendto nr" << errno << std::endl;
+					}
 					wyczysc();
 
 					for (int j = 0; j < (z2na10(dlugosc.to_string()) - 10); j = j + 8) {

@@ -319,8 +319,7 @@ void client::spakuj() {
 	ZeroMemory(buffer, 1024);
 	//std::cout << pomocnicza << std::endl;
 	for (int i = 0; i < buffer_size; i++) {
-		std::string bajt_1 = pomocnicza.substr(i * 8, 8);
-		buffer[i] = bit_to_int(bajt_1);
+		buffer[i] = std::stoi(pomocnicza.substr(i * 8, 8), nullptr, 2);
 	}
 
 	std::cout << std::endl << pomocnicza << std::endl;
@@ -360,17 +359,34 @@ void client::odpakuj() {
 		pomocnicza += zCna2(buffer[i]);
 	}
 
-		operacja = bit_to_int(pomocnicza.substr(0, 3));
-		odpowiedz = bit_to_int(pomocnicza.substr(3, 3));
-		dlugosc = bit_to_int(pomocnicza.substr(6, 32));
-		//dane = bit_to_int(pomocnicza.substr(38, bit_to_int(dlugosc.to_string()) - 10));
-		flagi = bit_to_int(pomocnicza.substr(bit_to_int(dlugosc.to_string()) + 28, 2));
-		id = bit_to_int(pomocnicza.substr(bit_to_int(dlugosc.to_string()) + 30, 8));
+	std::string s = "";
 
-		std::string s = "";
-		s = pomocnicza.substr(38, z2na10(dlugosc.to_string()) - 10);
-		dane = bit_to_int(s);
-		std::cout << "otrzymano :" << s << std::endl << " dl " << z2na10(dlugosc.to_string()) -10 << std::endl;
+	operacja = std::stoi(pomocnicza.substr(0, 3), nullptr,2);
+		odpowiedz = std::stoi(pomocnicza.substr(3, 3));
+		dlugosc = std::stoi(pomocnicza.substr(6, 32),nullptr,2);
+
+
+		int rozm = std::stoi(dlugosc.to_string(), nullptr, 2) - 10;
+		unsigned int bitset = 0;
+		if (rozm > 0)
+		{
+			for (int i = 0; i < rozm / 8 ; i ++)
+			{
+				danestr.push_back((char)std::stoi(pomocnicza.substr(38 + (i * 8), 8), nullptr, 2));
+				//bitset += std::stoi(pomocnicza.substr(38 + (i*8), 8), nullptr, 2);
+			}
+			//danestr += "\0";
+		}
+
+		//dane = bitset;
+
+
+
+		flagi = std::stoi(pomocnicza.substr(38 + std::stoi(dlugosc.to_string(),nullptr,2) -10, 2),nullptr, 2);
+		id = std::stoi(pomocnicza.substr(40 + std::stoi(dlugosc.to_string(), nullptr, 2) - 10, 8), nullptr, 2);
+
+		
+		std::cout << "otrzymano :"  << std::endl << " dl " << z2na10(dlugosc.to_string()) << std::endl;
 
 	//	std::cout << std::endl << "OP " << z2na10(operacja.to_string()) << "  OD " << z2na10(odpowiedz.to_string()) << "  DL " << z2na10(dlugosc.to_string()) << "  D " << z2na10(dane.to_string()) << "  FL " << z2na10(flagi.to_string()) << "  ID " << z2na10(id.to_string()) << std::endl;
 	}
@@ -602,16 +618,19 @@ void client::odbierz_wiadomosc(SOCKET client_socket, char buffer[1024], SOCKADDR
 			//std::string pom = dane.to_string();
 			char znak;
 			std::string pom = "";
-			pom = dane.to_string().substr(8154- (z2na10(dlugosc.to_string())), z2na10(dlugosc.to_string()));
+			//pom = dane.to_string().substr(8154- (z2na10(dlugosc.to_string())), z2na10(dlugosc.to_string()));
 
-			std::cout << pom << std::endl;
-			std::cout << "\nRozmowca napisal: " << std::endl;
-			
+			//std::cout << pom << std::endl;
+			std::cout << "\nRozmowca napisal: " << std::endl << danestr;
+			//printf("Test: %s, ", danestr);
+			danestr = "";
+			/*
 			for (int j = 0 ; j < pom.length(); j = j + 8) {
 				//std::cout<< z2na10(pom.substr(j, 8));
 				znak = z2na10(pom.substr(j, 8));
 				std::cout << znak;
 			}
+			*/
 			std::cout << std::endl;
 			
 			

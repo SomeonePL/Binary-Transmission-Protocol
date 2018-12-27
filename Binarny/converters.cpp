@@ -11,7 +11,7 @@ int z2na10(std::string z2na10_input) {
 
 std::string z10na2(int z10na2_input) {
 	if (z10na2_input == 0) {
-		return "00000000";
+		return "00110000";
 	}
 	std::string wynik2 = "";
 	while (z10na2_input > 0) {
@@ -28,9 +28,12 @@ std::string z10na2(int z10na2_input) {
 
 std::string zCna2(char z10na2_input) {
 	int pom = z10na2_input;
+	/*
 	if (pom == '0') {
-		return "00000000";
+		return "00110000";
 	}
+	*/
+
 	std::string wynik2 = "";
 
 	if (pom >= 0) {
@@ -60,20 +63,25 @@ std::string zCna2(char z10na2_input) {
 	return wynik2;
 }
 
+
+//https://stackoverflow.com/questions/23596988/binary-string-to-integer-with-atoi
+/*
 int bit_to_int(const std::string &s)
 {
 	int liczba = 0;
-	for (int i = s.size() - 1, p = 1; i >= 0; i--, p *= 2)
+	
+	for (int i = s.length() - 1, p = 1; i >= 0; i--, p *= 2)
 	{
 		if (s[i] == '1')
 			liczba += p;
 	}
 	return liczba;
 }
+*/
 
 char bit_to_char(std::string test) {
 	char pomocnicza;
-	pomocnicza = bit_to_int(test);
+	pomocnicza = std::stoi(test, nullptr, 2);
 
 	return pomocnicza;
 }

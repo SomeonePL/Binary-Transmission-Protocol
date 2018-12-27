@@ -24,6 +24,7 @@ private:
 	int identyfikator;
 	std::string text = "";
 	int buffer_size;
+	int tempsize;
 
 
 
@@ -31,6 +32,7 @@ private:
 	std::bitset<3> odpowiedz;
 	std::bitset<32> dlugosc;
 	std::bitset<8144> dane;
+	std::string danestr = "";
 	std::bitset<2> flagi;
 	std::bitset<8> id;
 
@@ -49,6 +51,7 @@ public:
 	void odrzuc_zaproszenie();
 	void zadaj_wyslania();
 	void potwierdzenie();
+	void potw();
 	void zadaj_zakonczenia();
 	void potwierdz_zakonczenie();
 	void odrzuc_zakonczenie();

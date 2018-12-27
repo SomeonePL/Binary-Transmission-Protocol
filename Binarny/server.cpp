@@ -29,8 +29,7 @@ void server::spakuj() {
 	std::cout << buffer_size << std::endl;
 	ZeroMemory(buffer, 1024);
 	for (int i = 0; i < buffer_size; i++) {
-		std::string bajt_1 = pomocnicza.substr(i * 8, 8);
-		buffer[i] = bit_to_int(bajt_1);
+		buffer[i] = std::stoi(pomocnicza.substr(i * 8, 8), nullptr, 2);
 	}
 	std::cout << std::endl << pomocnicza << std::endl;
 }
@@ -55,12 +54,25 @@ void server::odpakuj() {
 
 	//std::cout << pomocnicza << std::endl;
 
-		operacja = bit_to_int(pomocnicza.substr(0, 3));
-		odpowiedz = bit_to_int(pomocnicza.substr(3, 3));
-		dlugosc = bit_to_int(pomocnicza.substr(6, 32));
-		dane = bit_to_int(pomocnicza.substr(38, bit_to_int(dlugosc.to_string()) - 10));
-		flagi = bit_to_int(pomocnicza.substr(bit_to_int(dlugosc.to_string()) + 28, 2));
-		id = bit_to_int(pomocnicza.substr(bit_to_int(dlugosc.to_string()) + 30, 8));
+
+	operacja = std::stoi(pomocnicza.substr(0, 3), nullptr, 2);
+	odpowiedz = std::stoi(pomocnicza.substr(3, 3), nullptr, 2);
+	dlugosc = std::stoi(pomocnicza.substr(6, 32), nullptr, 2);
+	int rozm = std::stoi(dlugosc.to_string(), nullptr, 2) - 10;
+	//unsigned int bitset = 0;
+	if (rozm > 0)
+	{
+		for (int i = 0; i < rozm / 8 ; i += 1)
+		{
+			danestr.push_back((char) std::stoi(pomocnicza.substr(38 + (i*8) , 8), nullptr, 2));
+			//bitset += std::stoi(pomocnicza.substr(38 + (i*8), 8), nullptr, 2);
+		}
+	}
+
+	//dane = bitset;
+
+	flagi = std::stoi(pomocnicza.substr(38 + std::stoi(dlugosc.to_string(), nullptr, 2) - 10, 2), nullptr, 2);
+	id = std::stoi(pomocnicza.substr(40 + std::stoi(dlugosc.to_string(), nullptr, 2) - 10, 8), nullptr, 2);
 
 	 /*
 	else {
@@ -86,14 +98,6 @@ void server::odczytaj() {
 	std::cout << wynik;
 }
 
-int server::bit_to_int(const std::string &s) {
-	int liczba = 0;
-	for (int i = s.size() - 1, p = 1; i >= 0; i--, p *= 2) {
-		if (s[i] == '1')
-			liczba += p;
-	}
-	return liczba;
-}
 
 void server::wyczysc() {
 	operacja = 0;
@@ -201,6 +205,18 @@ void server::odrzuc_zakonczenie() {
 	spakuj();
 }
 
+void server::potwierdzenie() {
+	//POTWIERDZENIE OTRZYMANIA WIADOMOSCI
+	operacja = 2;
+	odpowiedz = 1;
+	dlugosc = 10;
+	dane = 0;
+	flagi = 0;
+	spakuj();
+	//std::cout << "Buffer size: " << buffer_size << std::endl;
+}
+
+
 
 void server::wymus_koniec()
 {
@@ -236,8 +252,11 @@ int server::UDP()
 		odpakuj();
 
 		if (operacja == 0 && odpowiedz == 0) {
+			potwierdzenie();
+			sendto(server_socket, buffer, buffer_size, 0, (sockaddr*)&current_address, sin_size);
 			std::cout << "<----uzytkownik probuje sie polaczyc---->\n";
 			if (users_counter == 0) {
+				
 				client1_address = current_address;
 				users_counter++;
 				wyczysc();

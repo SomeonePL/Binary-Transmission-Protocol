@@ -26,11 +26,13 @@ private:
 	int users_counter = 0;
 	std::string text;
 	int buffer_size;
+	int tempsize;
 
 	std::bitset<3> operacja;
 	std::bitset<3> odpowiedz;
 	std::bitset<32> dlugosc;
 	std::bitset<8144> dane;
+	std::string danestr = "";
 	std::bitset<2> flagi;
 	std::bitset<8> id;
 
@@ -38,10 +40,10 @@ private:
 	void odpakuj();
 	void odczytaj();
 	void wyczysc();
-	int bit_to_int(const std::string &s);
 
 	void zapisz(std::string napis);
 	void przyjmij_polaczenie();
+	void potwierdzenie();
 	void odrzuc_polaczenie();
 	void brak_klienta();
 	void odmow_wyslania();

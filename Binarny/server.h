@@ -30,7 +30,7 @@ private:
 	std::bitset<3> operacja;
 	std::bitset<3> odpowiedz;
 	std::bitset<32> dlugosc;
-	std::bitset<8112> dane;
+	std::bitset<8144> dane;
 	std::bitset<2> flagi;
 	std::bitset<8> id;
 

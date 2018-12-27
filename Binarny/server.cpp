@@ -21,21 +21,21 @@ void server::spakuj() {
 		pomocnicza = operacja.to_string();
 		pomocnicza += odpowiedz.to_string();
 		pomocnicza += dlugosc.to_string();
-		pomocnicza += dane.to_string();
+		pomocnicza += dane.to_string().substr(0, z2na10(dlugosc.to_string()) - 10);
 		pomocnicza += flagi.to_string();
 		pomocnicza += id.to_string();
 	}
 	buffer_size = pomocnicza.length() / 8;
 	std::cout << buffer_size << std::endl;
-
+	ZeroMemory(buffer, 1024);
 	for (int i = 0; i < buffer_size; i++) {
 		std::string bajt_1 = pomocnicza.substr(i * 8, 8);
 		buffer[i] = bit_to_int(bajt_1);
 	}
-	std::cout << std::endl << buffer << std::endl;
-
-	std::cout << buffer << std::endl;
+	std::cout << std::endl << pomocnicza << std::endl;
 }
+
+
 
 
 void server::odpakuj() {
@@ -53,7 +53,7 @@ void server::odpakuj() {
 		pomocnicza += zCna2(buffer[i]);
 	}
 
-	std::cout << pomocnicza << std::endl;
+	//std::cout << pomocnicza << std::endl;
 
 		operacja = bit_to_int(pomocnicza.substr(0, 3));
 		odpowiedz = bit_to_int(pomocnicza.substr(3, 3));
@@ -70,7 +70,7 @@ void server::odpakuj() {
 		id = bit_to_int(pomocnicza.substr(bit_to_int(dlugosc.to_string()) + 30, 8));
 	}
 	*/
-	buffer_size = z2na10(dlugosc.to_string()) / 8;
+	buffer_size = (z2na10(dlugosc.to_string())+38) / 8;
 
 }
 
@@ -78,7 +78,7 @@ void server::odczytaj() {
 	std::string bajt;
 	std::string wynik = "";
 	std::string pomocnicza = dane.to_string();
-	std::cout << pomocnicza;
+	//std::cout << pomocnicza;
 	for (int i = 0; i < (int)pomocnicza.length(); i = i + 8) {
 		bajt = pomocnicza.substr(i, 8);
 		wynik = wynik + bit_to_char(bajt);
@@ -172,7 +172,7 @@ void server::potwierdz_zakonczenie() {
 	//WYSLANIE ZADANIA POLACZENIA
 	operacja = 3;
 	odpowiedz = 1;
-	dlugosc = 0;
+	dlugosc = 10;
 	dane = 0;
 	flagi = 0;
 	spakuj();
@@ -214,37 +214,19 @@ void server::wymus_koniec()
 
 int server::UDP()
 {
-	
-	int wsResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (wsResult != 0)
-	{
-		std::cout << "Can't initialize winsock! Quiting" << std::endl;
-		
-	}
+	int iden; 
 
-	server_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (server_socket == INVALID_SOCKET)
-	{
-		std::cout << "Can't create socket, Err #" << WSAGetLastError() << std::endl;
-		WSACleanup();
-		
-	}
+	WSAStartup(MAKEWORD(2, 2), &wsaData); // Inicjalizacja WinSock
+
+	my_address.sin_family = AF_INET; //wybor rodziny adresow [IPv4]
+	my_address.sin_port = htons(55555); // przypisanie numeru portu [55555]
+	inet_pton(AF_INET, "127.0.0.1", &my_address.sin_addr); //przypisanie adresu IP [127.0.0.1]
+
+	server_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP); //tworzenie socketa
+	bind(server_socket, (sockaddr*)&my_address, sizeof(my_address)); //przypisanie socketa na podany port
 
 
-	my_address.sin_family = AF_INET;
-	my_address.sin_port = htons(55554);
-	my_address.sin_addr.S_un.S_addr = INADDR_ANY;
-
-	//inet_pton(AF_INET, "127.0.0.1", &my_address.sin_addr);
-
-	if (bind(server_socket, (sockaddr*)&my_address, sizeof(my_address)) == SOCKET_ERROR) {
-		std::cout << "Cant bind socket. Quiting!" << std::endl;
-		closesocket(server_socket);
-		WSACleanup();
-		
-	}
-
-	bind(server_socket, (sockaddr*)&my_address, sizeof(my_address));
+	//bind(server_socket, (sockaddr*)&my_address, sizeof(my_address));
 	std::cout << "Zbindowano" << std::endl;
 
 	
@@ -261,6 +243,7 @@ int server::UDP()
 				wyczysc();
 				srand(time(NULL));
 				id = 254;
+				iden = 254;
 				std::cout << "<----wygenerowano id sesji---->\nID: " << id << std::endl;
 				przyjmij_polaczenie();
 				//sendto(server_socket, buffer, sizeof(buffer), 0, (sockaddr*)&current_address, sin_size);
@@ -272,13 +255,14 @@ int server::UDP()
 						client2_address = current_address;
 						users_counter++;
 						wyczysc();
+						id = iden;
 						przyjmij_polaczenie();
 						//sendto(server_socket, buffer, 8, 0, (sockaddr*)&client2_address, sin_size);
 						std::cout << "<----zezwolono na polaczenie uzytkownikowi #02---->\n";
 					}
 				}
 				else {
-					users_counter++;
+					//users_counter++;
 					wyczysc();
 					odrzuc_polaczenie();
 					//sendto(server_socket, buffer, 8, 0, (sockaddr*)&current_address, sin_size);
@@ -298,29 +282,29 @@ int server::UDP()
 			if (users_counter > 1) {
 				std::cout << "<----zaproszono drugiego uzytkownika---->\n";
 				if (current_address.sin_port == client1_address.sin_port) {
-					odpakuj();
+					//odpakuj();
 					std::cout << "<SERVER INFOLOG> user #01 --> server: ";
-					odczytaj();
+					//odczytaj();
 					//int rozmiar = 0;
 					//std::string roz = dlugosc.to_string();
 					//rozmiar = z2na10(roz.substr(0, 8)) * 1000 + z2na10(roz.substr(8, 8)) * 100 + z2na10(roz.substr(16, 8)) * 10 + z2na10(roz.substr(24, 8)) * 1;
 					//buffer_size = rozmiar;
 					sendto(server_socket, buffer, buffer_size, 0, (sockaddr*)&client2_address, sin_size);
 					std::cout << "<SERVER INFOLOG> server --> user #02: ";
-					odczytaj();
+					//odczytaj();
 					wyczysc();
 				}
 				else {
-					odpakuj();
+					//odpakuj();
 					std::cout << "<SERVER INFOLOG> user #02 --> server: ";
-					odczytaj();
+					//odczytaj();
 					//int rozmiar = 0;
 					//std::string roz = dlugosc.to_string();
 					//rozmiar = z2na10(roz.substr(0, 8)) * 1000 + z2na10(roz.substr(8, 8)) * 100 + z2na10(roz.substr(16, 8)) * 10 + z2na10(roz.substr(24, 8)) * 1;
 					//buffer_size = rozmiar;
 					sendto(server_socket, buffer, buffer_size, 0, (sockaddr*)&client1_address, sin_size);
 					std::cout << "<SERVER INFOLOG> server --> user #01: ";
-					odczytaj();
+					//odczytaj();
 					wyczysc();
 				}
 			}
@@ -339,40 +323,40 @@ int server::UDP()
 
 		if (operacja == 1 && odpowiedz == 1) {
 			if (current_address.sin_port == client1_address.sin_port) {
-				odpakuj();
+				//odpakuj();
 				std::cout << "<SERVER INFOLOG> user #01 --> server: ";
-				odczytaj();
+				//odczytaj();
 				sendto(server_socket, buffer, buffer_size, 0, (sockaddr*)&client2_address, sin_size);
 				std::cout << "<SERVER INFOLOG> server --> user #02: ";
-				odczytaj();
+				//odczytaj();
 			}
 			else {
-				odpakuj();
+				//odpakuj();
 				std::cout << "<SERVER INFOLOG> user #02 --> server: ";
-				odczytaj();
+				//odczytaj();
 				sendto(server_socket, buffer, buffer_size, 0, (sockaddr*)&client1_address, sin_size);
 				std::cout << "<SERVER INFOLOG> server --> user #01: ";
-				odczytaj();
+				//odczytaj();
 			}
 		}
 
 		if (operacja == 1 && odpowiedz == 2) {
 
 			if (current_address.sin_port == client1_address.sin_port) {
-				odpakuj();
+				//odpakuj();
 				std::cout << "<SERVER INFOLOG> user #01 --> server: ";
-				odczytaj();
+				//odczytaj();
 				sendto(server_socket, buffer, buffer_size, 0, (sockaddr*)&client2_address, sin_size);
 				std::cout << "<SERVER INFOLOG> server --> user #02: ";
-				odczytaj();
+				//odczytaj();
 			}
 			else {
-				odpakuj();
+				//odpakuj();
 				std::cout << "<SERVER INFOLOG> user #02 --> server: ";
-				odczytaj();
+				//odczytaj();
 				sendto(server_socket, buffer, buffer_size, 0, (sockaddr*)&client1_address, sin_size);
 				std::cout << "<SERVER INFOLOG> server --> user #01: ";
-				odczytaj();
+				//odczytaj();
 			}
 		}
 
@@ -384,20 +368,20 @@ int server::UDP()
 		if (operacja == 2 && odpowiedz == 0) {
 
 			if (current_address.sin_port == client1_address.sin_port) {
-				odpakuj();
+				//odpakuj();
 				std::cout << "<SERVER INFOLOG> user #01 --> server: ";
-				odczytaj();
+				//odczytaj();
 				sendto(server_socket, buffer, buffer_size, 0, (sockaddr*)&client2_address, sin_size);
 				std::cout << "<SERVER INFOLOG> server --> user #02: ";
-				odczytaj();
+				//odczytaj();
 			}
 			else {
-				odpakuj();
+				//odpakuj();
 				std::cout << "<SERVER INFOLOG> user #02 --> server: ";
-				odczytaj();
+				//odczytaj();
 				sendto(server_socket, buffer, buffer_size, 0, (sockaddr*)&client1_address, sin_size);
 				std::cout << "<SERVER INFOLOG> server --> user #01: ";
-				odczytaj();
+				//odczytaj();
 			}
 		}
 
@@ -406,17 +390,17 @@ int server::UDP()
 			if (current_address.sin_port == client1_address.sin_port) {
 				;
 				std::cout << "<SERVER INFOLOG> user #01 --> server: ";
-				odczytaj();
+				//odczytaj();
 				sendto(server_socket, buffer, buffer_size, 0, (sockaddr*)&client2_address, sin_size);
 				std::cout << "<SERVER INFOLOG> server --> user #02: ";
-				odczytaj();
+				//odczytaj();
 			}
 			else {
 				std::cout << "<SERVER INFOLOG> user #02 --> server: ";
-				odczytaj();
+				//odczytaj();
 				sendto(server_socket, buffer, buffer_size, 0, (sockaddr*)&client1_address, sin_size);
 				std::cout << "<SERVER INFOLOG> server --> user #01: ";
-				odczytaj();
+				//odczytaj();
 			}
 		}
 

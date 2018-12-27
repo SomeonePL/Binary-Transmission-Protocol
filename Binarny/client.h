@@ -22,13 +22,15 @@ private:
 	char buffer[1024];
 	int sin_size = sizeof(sockaddr_in);
 	int identyfikator;
-	std::string text;
+	std::string text = "";
 	int buffer_size;
+
+
 
 	std::bitset<3> operacja;
 	std::bitset<3> odpowiedz;
 	std::bitset<32> dlugosc;
-	std::bitset<8112> dane;
+	std::bitset<8144> dane;
 	std::bitset<2> flagi;
 	std::bitset<8> id;
 
@@ -41,7 +43,6 @@ public:
 	void odpakuj();
 	void odczytaj();
 	void wyczysc();
-	int bit_to_int(const std::string &s);
 	void zadaj_polaczenia();
 	void zadaj_zaproszenia();
 	void przyjmij_zaproszenie();

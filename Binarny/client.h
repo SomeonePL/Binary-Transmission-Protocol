@@ -58,4 +58,3 @@ private:
 public:
 	int UDP();
 };
-

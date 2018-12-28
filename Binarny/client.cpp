@@ -59,7 +59,7 @@ void client::zadaj_polaczenia() {
 	flagi = 0;
 	id = 0;
 	spakuj();
-	//std::cout << "Buffer size: " << buffer_size << std::endl;
+
 }
 
 
@@ -72,7 +72,7 @@ void client::zadaj_zaproszenia() {
 	flagi = 0;
 	id = identyfikator;
 	spakuj();
-	//std::cout << "Buffer size: " << buffer_size << std::endl;
+
 }
 
 void client::przyjmij_zaproszenie() {
@@ -84,7 +84,7 @@ void client::przyjmij_zaproszenie() {
 	flagi = 0;
 	id = identyfikator;
 	spakuj();
-	//std::cout << "Buffer size: " << buffer_size << std::endl;
+
 }
 
 void client::odrzuc_zaproszenie() {
@@ -96,7 +96,6 @@ void client::odrzuc_zaproszenie() {
 	flagi = 0;
 	id = identyfikator;
 	spakuj();
-	//std::cout << "Buffer size: "<<  buffer_size << std::endl;
 }
 
 void client::potwierdzenie() {
@@ -108,7 +107,6 @@ void client::potwierdzenie() {
 	flagi = 0;
 	id = identyfikator;
 	spakuj();
-	//std::cout << "Buffer size: " << buffer_size << std::endl;
 }
 
 void client::zadaj_zakonczenia() {
@@ -120,7 +118,6 @@ void client::zadaj_zakonczenia() {
 	flagi = 0;
 	id = identyfikator;
 	spakuj();
-	//std::cout << "Buffer size: " << buffer_size << std::endl;
 }
 
 void client::potwierdz_zakonczenie() {
@@ -132,7 +129,6 @@ void client::potwierdz_zakonczenie() {
 	flagi = 0;
 	id = identyfikator;
 	spakuj();
-	//std::cout << "Buffer size: " << buffer_size << std::endl;
 }
 
 void client::ponow() {
@@ -194,7 +190,6 @@ void client::zadaj_wyslania() {
 	if (text == "#") {
 		zadaj_zakonczenia();
 
-		//std::cout << "Buffer size: " << buffer_size << std::endl;
 		if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
 		{
 			std::cout << "Blad sendto nr" << errno << std::endl;
@@ -213,32 +208,22 @@ void client::zadaj_wyslania() {
 	else {
 		operacja = 2;
 		odpowiedz = 0;
-		int d = text.size() * 8 + 10;//rozmiar
-		//buffer_size = 6 + text.size();
+		int d = text.size() * 8 + 10;  //rozmiar
 
-		//std::string ciag = "";
-		//for (int i = 0; i < (int) text.length(); i++) {
-		// ciag = ciag;
-		//wiadomosc = wiadomosc + znak;
-		//}
 
 		if (d <= 1019 * 8) {
 			flagi = 0;
-			id = identyfikator;//identyfikator
+			id = identyfikator;
 			dlugosc = d;
 			zapisz(text);
-			//std::cout << "<WYSYLAM> DZIALANIE: " << dzialanie << " ODPOWIEDZ:" << odpowiedz << " DLUGOSC:" << dlugosc << " TEKST:" << wiadomosc;
-			
 			spakuj();
-
-			//std::cout << "Buffer size: " << buffer_size << std::endl;
 
 			if (sendto(client_socket, buffer, buffer_size, 0, (sockaddr *)&dest_addr, sin_size) == -1)
 			{
 				std::cout << "Blad sendto nr" << errno << std::endl;
 			}
 
-		} // DZIELENIE NA PACZKI
+		}
 		else {
 			float paczki = d / (1019 * 8);
 			paczki = ceil(paczki);
@@ -247,7 +232,7 @@ void client::zadaj_wyslania() {
 
 
 			for (int i = 0; i < paczki - 1; i++) {
-				
+
 				flagi = 3;
 				id = identyfikator;
 				dlugosc = 1019;
@@ -261,16 +246,14 @@ void client::zadaj_wyslania() {
 
 				}
 
-			
+
 				while (operacja != 2 && odpowiedz != 7)
 				{
-					
+
 				}
 			}
 
-			
-
-			std::cout << std::endl << wyslane << "< wyslane " << paczki << " < paczki" ;
+			std::cout << std::endl << wyslane << "< wyslane " << paczki << " < paczki";
 			flagi = 2;
 			id = identyfikator;
 
@@ -294,6 +277,7 @@ void client::zadaj_wyslania() {
 //
 
 //OPERACJE NA DANYCH
+
 void client::spakuj() {
 
 	std::string pomocnicza = "";
@@ -302,7 +286,6 @@ void client::spakuj() {
 		pomocnicza = operacja.to_string();
 		pomocnicza += odpowiedz.to_string();
 		pomocnicza += dlugosc.to_string();
-		//pomocnicza += wiadomosc.to_string();
 		pomocnicza += flagi.to_string();
 		pomocnicza += id.to_string();
 	}
@@ -310,20 +293,18 @@ void client::spakuj() {
 		pomocnicza = operacja.to_string();
 		pomocnicza += odpowiedz.to_string();
 		pomocnicza += dlugosc.to_string();
-		pomocnicza += dane.to_string().substr(0,z2na10(dlugosc.to_string())-10);
+		pomocnicza += dane.to_string().substr(0, z2na10(dlugosc.to_string()) - 10);
 		pomocnicza += flagi.to_string();
 		pomocnicza += id.to_string();
 	}
-	buffer_size = pomocnicza.length()/8;
+	buffer_size = pomocnicza.length() / 8;
 	std::cout << buffer_size << std::endl;
 	ZeroMemory(buffer, 1024);
-	//std::cout << pomocnicza << std::endl;
 	for (int i = 0; i < buffer_size; i++) {
 		buffer[i] = std::stoi(pomocnicza.substr(i * 8, 8), nullptr, 2);
 	}
 
-	std::cout << std::endl << pomocnicza << std::endl;
-	//std::cout << std::endl << "OP " << z2na10(operacja.to_string()) << "  OD " << z2na10(odpowiedz.to_string()) << "  DL " << z2na10(dlugosc.to_string()) << "  D " << z2na10(dane.to_string()) << "  FL " << z2na10(flagi.to_string()) << "  ID " << z2na10(id.to_string()) << std::endl;
+	//std::cout << std::endl << pomocnicza << std::endl;
 
 }
 
@@ -347,13 +328,6 @@ void client::zapisz(std::string napis) {
 void client::odpakuj() {
 
 	std::string pomocnicza = "";
-	/*
-	std::string pom = zCna2(buffer[0]);
-	operacja = bit_to_int(pom.substr(0, 3));
-	odpowiedz = bit_to_int(pom.substr(3, 3));
-	pom = zCna2(buffer[5]);
-	id = bit_to_int(pom.substr(0, 8));
-	*/
 
 	for (int i = 0; i < 1024; i++) {
 		pomocnicza += zCna2(buffer[i]);
@@ -361,35 +335,32 @@ void client::odpakuj() {
 
 	std::string s = "";
 
-	operacja = std::stoi(pomocnicza.substr(0, 3), nullptr,2);
-		odpowiedz = std::stoi(pomocnicza.substr(3, 3));
-		dlugosc = std::stoi(pomocnicza.substr(6, 32),nullptr,2);
+	operacja = std::stoi(pomocnicza.substr(0, 3), nullptr, 2);
+	odpowiedz = std::stoi(pomocnicza.substr(3, 3));
+	dlugosc = std::stoi(pomocnicza.substr(6, 32), nullptr, 2);
 
 
-		int rozm = std::stoi(dlugosc.to_string(), nullptr, 2) - 10;
-		unsigned int bitset = 0;
-		if (rozm > 0)
+	int rozm = std::stoi(dlugosc.to_string(), nullptr, 2) - 10;
+	unsigned int bitset = 0;
+	if (rozm > 0)
+	{
+		for (int i = 0; i < rozm / 8; i++)
 		{
-			for (int i = 0; i < rozm / 8 ; i ++)
-			{
-				danestr.push_back((char)std::stoi(pomocnicza.substr(38 + (i * 8), 8), nullptr, 2));
-				//bitset += std::stoi(pomocnicza.substr(38 + (i*8), 8), nullptr, 2);
-			}
-			//danestr += "\0";
+			danestr.push_back((char)std::stoi(pomocnicza.substr(38 + (i * 8), 8), nullptr, 2));
 		}
 
-		//dane = bitset;
-
-
-
-		flagi = std::stoi(pomocnicza.substr(38 + std::stoi(dlugosc.to_string(),nullptr,2) -10, 2),nullptr, 2);
-		id = std::stoi(pomocnicza.substr(40 + std::stoi(dlugosc.to_string(), nullptr, 2) - 10, 8), nullptr, 2);
-
-		
-		std::cout << "otrzymano :"  << std::endl << " dl " << z2na10(dlugosc.to_string()) << std::endl;
-
-	//	std::cout << std::endl << "OP " << z2na10(operacja.to_string()) << "  OD " << z2na10(odpowiedz.to_string()) << "  DL " << z2na10(dlugosc.to_string()) << "  D " << z2na10(dane.to_string()) << "  FL " << z2na10(flagi.to_string()) << "  ID " << z2na10(id.to_string()) << std::endl;
 	}
+
+
+	flagi = std::stoi(pomocnicza.substr(38 + std::stoi(dlugosc.to_string(), nullptr, 2) - 10, 2), nullptr, 2);
+	id = std::stoi(pomocnicza.substr(40 + std::stoi(dlugosc.to_string(), nullptr, 2) - 10, 8), nullptr, 2);
+
+
+	//std::cout << "otrzymano :" << std::endl << " dl " << z2na10(dlugosc.to_string()) << std::endl;
+
+}
+
+
 
 
 void client::odczytaj() {
@@ -407,6 +378,7 @@ void client::odczytaj() {
 
 
 //KLIENT
+
 int client::UDP() {
 	//WINSOCK
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -416,7 +388,6 @@ int client::UDP() {
 	dest_addr.sin_port = htons(55555);
 	inet_pton(AF_INET, "127.0.0.1", &dest_addr.sin_addr);
 
-	//ZADANIE POLACZENIA
 	std::cout << "<---proba nawiazania polaczenia--->\n";
 	zadaj_polaczenia();
 	sendto(client_socket, buffer, buffer_size, 0, (sockaddr*)&dest_addr, sin_size);
@@ -498,10 +469,6 @@ int client::UDP() {
 
 		if (operacja == 1 && odpowiedz == 1) {
 			std::cout << "<----uzytkownik przyjal zaproszenie---->\n";
-			/*wyczysc();
-			zadaj_wyslania();
-			spakuj();
-			sendto(client_socket, buffer, buffer_size / 8, 0, (sockaddr*)&dest_addr, sin_size);*/
 			rozmowa();
 		}
 
@@ -615,25 +582,13 @@ void client::odbierz_wiadomosc(SOCKET client_socket, char buffer[1024], SOCKADDR
 		}
 
 		if (operacja == 2 && odpowiedz == 0) {
-			//std::string pom = dane.to_string();
-			char znak;
 			std::string pom = "";
-			//pom = dane.to_string().substr(8154- (z2na10(dlugosc.to_string())), z2na10(dlugosc.to_string()));
 
-			//std::cout << pom << std::endl;
 			std::cout << "\nRozmowca napisal: " << std::endl << danestr;
-			//printf("Test: %s, ", danestr);
 			danestr = "";
-			/*
-			for (int j = 0 ; j < pom.length(); j = j + 8) {
-				//std::cout<< z2na10(pom.substr(j, 8));
-				znak = z2na10(pom.substr(j, 8));
-				std::cout << znak;
-			}
-			*/
 			std::cout << std::endl;
-			
-			
+
+
 
 
 			potwierdzenie();
@@ -643,7 +598,7 @@ void client::odbierz_wiadomosc(SOCKET client_socket, char buffer[1024], SOCKADDR
 			}
 			wyczysc();
 
-	
+
 			std::cout << std::endl;
 
 			if (flagi == 3)
@@ -677,7 +632,7 @@ void client::rozmowa() {
 		zadaj_wyslania();
 		wyczysc();
 
-		if (operacja == 0 && odpowiedz == 0)
+		while (operacja == 0 && odpowiedz == 0)
 		{
 
 		}

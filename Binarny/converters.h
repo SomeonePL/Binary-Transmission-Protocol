@@ -19,6 +19,6 @@ std::string z10na2(int z10na2_input);
 
 std::string zCna2(char z10na2_input);
 
-//int bit_to_int(const std::string &s);
+//int bit_to_int(const std::string &s); << ZASTAPIONE FUNKCJA STOI
 
 char bit_to_char(std::string);

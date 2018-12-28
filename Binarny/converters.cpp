@@ -28,11 +28,6 @@ std::string z10na2(int z10na2_input) {
 
 std::string zCna2(char z10na2_input) {
 	int pom = z10na2_input;
-	/*
-	if (pom == '0') {
-		return "00110000";
-	}
-	*/
 
 	std::string wynik2 = "";
 
@@ -69,7 +64,7 @@ std::string zCna2(char z10na2_input) {
 int bit_to_int(const std::string &s)
 {
 	int liczba = 0;
-	
+
 	for (int i = s.length() - 1, p = 1; i >= 0; i--, p *= 2)
 	{
 		if (s[i] == '1')

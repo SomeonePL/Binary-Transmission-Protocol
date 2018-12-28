@@ -26,7 +26,6 @@ private:
 	int users_counter = 0;
 	std::string text;
 	int buffer_size;
-	int tempsize;
 
 	std::bitset<3> operacja;
 	std::bitset<3> odpowiedz;
@@ -40,7 +39,6 @@ private:
 	void odpakuj();
 	void odczytaj();
 	void wyczysc();
-
 	void zapisz(std::string napis);
 	void przyjmij_polaczenie();
 	void potwierdzenie();

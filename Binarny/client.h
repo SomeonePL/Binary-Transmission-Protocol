@@ -24,8 +24,6 @@ private:
 	int identyfikator;
 	std::string text = "";
 	int buffer_size;
-	int tempsize;
-
 
 
 	std::bitset<3> operacja;
@@ -36,7 +34,7 @@ private:
 	std::bitset<2> flagi;
 	std::bitset<8> id;
 
-public:
+
 	void ponow();
 	void odbierz_wiadomosc(SOCKET client_socket, char buffer[1024], SOCKADDR_IN dest_addr, int sin_size);
 	void rozmowa();
@@ -57,6 +55,7 @@ public:
 	void odrzuc_zakonczenie();
 	void wymus_koniec();
 
+public:
 	int UDP();
 };
 
